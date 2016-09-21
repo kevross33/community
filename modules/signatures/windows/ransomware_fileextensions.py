@@ -59,6 +59,7 @@ class RansomwareExtensions(Signature):
         (".*\.cry$", ["CryLocker"]),
         (".*\.locked$", ["multi-family"]),
         (".*\.locklock$", ["LockLock"]),
+        (".*\.fantom$", ["Fantom"]),
     ]
 
     def on_complete(self):
