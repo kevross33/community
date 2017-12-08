@@ -122,7 +122,7 @@ class OverwritesFiles(Signature):
     count = 0
 
     def on_call(self, call, process):
-        if call["arguments"]["create_disposition"] == 5:
+        if call["arguments"]["create_disposition"] == 5 and "\\AppData\\Local\\Microsoft\\Windows\\Temporary Internet Files\\" not in call["arguments"]["filepath"] and "\\AppData\\Local\\Temp\\" not in call["arguments"]["filepath"]:
             self.count += 1
             self.mark_call()
 
@@ -138,3 +138,18 @@ class OverwritesFiles(Signature):
             elif self.count > 100:
                 self.severity = 3
             return self.has_marks()
+
+class RansomwareMassFileDelete(Signature):
+    name = "ransomware_mass_file_delete"
+    description = "Deletes a large number of files from the system indicative of ransomware, wiper malware or system destruction"
+    severity = 3
+    categories = ["ransomware", "wiper"]
+    authors = ["Kevin Ross"]
+    minimum = "2.0"
+    evented = True
+
+    def on_complete(self):
+        for deletedfile in self.get_files(actions=["file_deleted"]):
+            self.mark_ioc("file", deletedfile)
+
+        return self.has_marks(200)
